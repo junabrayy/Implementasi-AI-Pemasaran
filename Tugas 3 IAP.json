@@ -1,0 +1,283 @@
+{
+  "name": "Tugas 3 IAP",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "c1d9f379-9acf-4d0b-b63d-be97843f3e9b",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1_hx08Z1o0oEjJnZ9GQIOQCWD5djb3TFq76qbqHiK7zc",
+          "mode": "list",
+          "cachedResultName": "Spreadsheet n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_hx08Z1o0oEjJnZ9GQIOQCWD5djb3TFq76qbqHiK7zc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 561763189,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_hx08Z1o0oEjJnZ9GQIOQCWD5djb3TFq76qbqHiK7zc/edit#gid=561763189"
+        },
+        "options": {}
+      },
+      "id": "a5869a77-73a2-4fe2-b9bd-41a3c2c7895d",
+      "name": "Get Rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -208,
+        128
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DlUXvBQCTWMrnZy1",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst now = new Date(new Date().toLocaleString(\"en-US\", { timeZone: \"Asia/Jakarta\" }));\n\nconst results = [];\n\nfor (const item of items) {\n  const data = item.json;\n\n  const tanggal = data[\"Scheduled Date\"];\n  const waktu = data[\"Scheduled Time\"];\n  const status = data[\"Status\"];\n\n  // bikin case insensitive\n  if (!tanggal || !waktu || status?.toLowerCase() !== \"pending\") continue;\n\n  const scheduled = new Date(`${tanggal} ${waktu}`);\n\n  if (isNaN(scheduled)) continue;\n\n  if (scheduled <= now) {\n    results.push({\n      json: {\n        ...data,\n        row_number: data.row_number,\n        Status: \"Published\"\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "c96c91f6-5c55-419d-bb3e-ab875861fb14",
+      "name": "Filter & Time Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "1026560154",
+        "text": "={{ $json.Content }}",
+        "additionalFields": {}
+      },
+      "id": "6328fe1f-7807-41e2-827b-6c33d9e5712f",
+      "name": "Send Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        192,
+        128
+      ],
+      "webhookId": "6805cdb3-d33e-4d0a-ab41-a672c1eca01c",
+      "credentials": {
+        "telegramApi": {
+          "id": "L36YKcgmVL0lUNUE",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "90406706-b134-466a-89ac-71f37bcf0e7d",
+      "name": "Prepare Update",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        384,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1_hx08Z1o0oEjJnZ9GQIOQCWD5djb3TFq76qbqHiK7zc",
+          "mode": "list",
+          "cachedResultName": "Spreadsheet n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_hx08Z1o0oEjJnZ9GQIOQCWD5djb3TFq76qbqHiK7zc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 561763189,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_hx08Z1o0oEjJnZ9GQIOQCWD5djb3TFq76qbqHiK7zc/edit#gid=561763189"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "6",
+            "Content": "park jonggun",
+            "Scheduled Date": "2026-04-16",
+            "Scheduled Time": "18:45",
+            "Status": "publish",
+            "row_number": 6
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scheduled Date",
+              "displayName": "Scheduled Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scheduled Time",
+              "displayName": "Scheduled Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "6f715eb9-1f37-43be-b277-6cb00c68ca75",
+      "name": "Update Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        592,
+        128
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DlUXvBQCTWMrnZy1",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rows": {
+      "main": [
+        [
+          {
+            "node": "Filter & Time Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Time Logic": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram": {
+      "main": [
+        [
+          {
+            "node": "Prepare Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Update": {
+      "main": [
+        [
+          {
+            "node": "Update Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f7601918-b1f1-4212-b004-668b55313145",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3ba048c0ab57705cbdbbe485a9881c9179be0d0dbccc1de86762e3890925f59"
+  },
+  "id": "dHfN1D4kUpLhoZ1B",
+  "tags": []
+}
